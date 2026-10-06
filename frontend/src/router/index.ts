@@ -18,6 +18,7 @@ const Conservation = () => import('@/views/conservation/index.vue')
 const Coordinate = () => import('@/views/coordinate/index.vue')
 const Storage = () => import('@/views/storage/index.vue')
 const Material = () => import('@/views/material/index.vue')
+const MaterialRequisition = () => import('@/views/material-requisition/index.vue')
 const Visit = () => import('@/views/visit/index.vue')
 
 const router = createRouter({
@@ -41,6 +42,7 @@ const router = createRouter({
     { path: '/coordinate', name: 'coordinate', component: Coordinate },
     { path: '/storage', name: 'storage', component: Storage },
     { path: '/material', name: 'material', component: Material },
+    { path: '/material-requisition', name: 'material-requisition', component: MaterialRequisition },
     { path: '/visit', name: 'visit', component: Visit },
   ],
 })
