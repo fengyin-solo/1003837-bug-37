@@ -1,5 +1,11 @@
 import { MODULE_BY_KEY } from '@/data/modules'
 import { allRows, listRows, resetRows, saveRows } from '@/data/local-store'
+import {
+  BusinessError,
+  confirmInbound,
+  markDisabled,
+  startPurchase,
+} from '@/api/material-service'
 import type { ActionResult, EntryRow, ModuleMeta, OverviewResult, PageResult } from '@/data/types'
 
 // 会写进数据的「往回走」动作：命中就把这条记录标成异常态，看板上能一眼看出来。
@@ -28,7 +34,31 @@ export function listEntries(key: string, filters: Record<string, string> = {}): 
   return { items: matched, total: matched.length, page: 1, size: matched.length }
 }
 
+/**
+ * 通用动作入口。耗材模块的库存/采购类动作必须走耗材专用服务：
+ * 那里有数量回写、预警去重、领用清单联动与乐观锁，通用流转不能直接改它的状态。
+ */
 export function runAction(key: string, id: number, action: string): ActionResult {
+  if (key === 'material') {
+    try {
+      if (action === '发起采购') {
+        return startPurchase(id)
+      }
+      if (action === '标记停用') {
+        return markDisabled(id)
+      }
+      if (action === '确认入库') {
+        // 入库需要数量与版本，页面必须直接调 confirmInbound；走到这里说明入口用错。
+        return { ok: false, message: '确认入库需要填写入库数量，请在耗材管理页操作' }
+      }
+    } catch (error) {
+      if (error instanceof BusinessError) {
+        return { ok: false, message: error.message }
+      }
+      throw error
+    }
+  }
+
   const meta = moduleMeta(key)
   const target = meta.actionTargets[action]
   if (!target) {

@@ -65,7 +65,12 @@ npm run build
 
 - 每个模块的页面在 `frontend/src/views/<模块>/index.vue`，页面只负责渲染，读写统一走
   `frontend/src/api/local-service.ts`。
+- 耗材模块（`material`）有独立业务面：库存扣减、预警阈值去重、采购/入库与领用清单在
+  `frontend/src/api/material-service.ts` 里以整库事务提交；领用页在
+  `frontend/src/views/material/requisition.vue`，路由 `/material/requisition`。
 - 字段、状态、动作与流转目标集中在 `frontend/src/data/modules.ts`；示例数据在
   `frontend/src/data/seed.ts`。
-- 状态流转只允许在 `local-service.ts` 里改，页面组件不做业务判断。
+- 状态流转只允许在 `local-service.ts`（普通模块）与 `material-service.ts`（耗材）里改，
+  页面组件不做业务判断。
+- 耗材业务链路的场景验证：`cd frontend && npm run test:material`。
 - 想回到初始数据：清掉浏览器里 `field-archaeology-digital:entries` 这一项，或调用 `resetModule(模块)`。
